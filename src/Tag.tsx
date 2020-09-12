@@ -5,9 +5,9 @@ export type SizeType = "small" | "middle" | "large";
 export interface TagProps {
   size?: SizeType; // TODO
   children: React.ReactNode;
+  hasChildren: boolean;
   inPath: boolean;
   checked: boolean;
-  hasChildren: boolean;
   hasChildrenChecked: boolean;
   onClick?: () => void;
 }
@@ -16,9 +16,9 @@ export default function Tag(props: TagProps) {
   const {
     size = "middle",
     children,
+    hasChildren,
     inPath,
     checked,
-    hasChildren,
     hasChildrenChecked,
     onClick = () => {},
   } = props;
