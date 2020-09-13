@@ -77,7 +77,13 @@ const dataSource: Array<CascaderOptionType> = [
 
 ReactDOM.render(
   <React.StrictMode>
-    <CascaderSelectTag dataSource={dataSource} />
+    <CascaderSelectTag
+      dataSource={dataSource}
+      value={[["1", "1-2", "1-2-2", "1-2-2-1"]]}
+      onChange={(result) => {
+        console.log(result);
+      }}
+    />
   </React.StrictMode>,
   document.getElementById("root")
 );

@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import Tag, { SizeType } from "./Tag";
 
 const rootId = "$DUMMY_ROOT$";
-const connectStr = "|-|";
+const splitter = "|-|";
 
 function getNodeId(parentId: string, value: ValueType) {
-  return `${parentId}${connectStr}${value}`;
+  return `${parentId}${splitter}${value}`;
 }
 
 export type ValueType = string | number;
@@ -45,10 +45,11 @@ const defaultProps = {
   defaultValue: [] as Array<Array<ValueType>>,
   multiple: false,
   size: "middle" as SizeType,
-  onChange: () => {},
 };
 
-export type CascaderSelectTagProps = typeof defaultProps;
+export type CascaderSelectTagProps = typeof defaultProps & {
+  onChange?: (result: Array<Array<string>>) => void;
+};
 
 type CascaderTreeType = {
   [key: string]: CascaderNodeType;
@@ -115,7 +116,7 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
   const getNextTree = useCallback(
     (nowTree: CascaderTreeType, nodeId: string) => {
       const nextTree = { ...nowTree };
-      const node = cascaderTree[nodeId];
+      const node = nextTree[nodeId];
 
       // 先取消所有节点的 inPath
       const nodeInpathTmp = node.inPath; // 为了双击收起能正常显示 inPath
@@ -140,7 +141,7 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
         // unchecked => checked
       } else if (!node.checked) {
         // 父子节点勾选互斥，如果点击的是父节点，那也要将所有的子节点取消状态
-        let tmp: CascaderNodeType[] = [node];
+        let cleanRoots: CascaderNodeType[] = [node];
         let parentNode = nextTree[node.parentId];
         if (parentNode && parentNode.checked) {
           parentNode.checked = false;
@@ -155,18 +156,18 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
           }
           if (!parentNode.multiple && parentNode.hasChildrenChecked) {
             // 父节点单选，之前有其他子节点被选择过，那就要清空其他的
-            tmp[0] = parentNode;
+            cleanRoots[0] = parentNode;
           }
           parentNode = nextTree[parentNode.parentId];
         }
         if (parentNode == null && !multiple) {
-          tmp = [...nodeMatrix[0]];
+          cleanRoots = [...nodeMatrix[0]];
         }
         (function recursive(nodes: CascaderNodeType[]) {
           nodes.forEach((iNode) => {
             iNode.checked = false;
             iNode.hasChildrenChecked = false;
-            iNode.inPath = false; // TODO 重复
+            iNode.inPath = false;
             recursive(
               iNode.children
                 .map((id) => nextTree[id])
@@ -176,7 +177,7 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
                 )
             );
           });
-        })(tmp);
+        })(cleanRoots);
 
         // 再顺着还原 inPath、hasChildrenChecked
         parentNode = nextTree[node.parentId];
@@ -195,38 +196,39 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
         }
         // checked => unchecked
       } else {
-        // TODO 影响父级的 hasChildrenChecked
+        // 父节点的 hasChildrenChecked 一定为 true
         node.checked = false;
+        let parentNode = nextTree[node.parentId];
+        while (parentNode != null) {
+          if (parentNode.multiple) {
+            const childrenCheckedResult = parentNode.children
+              .map((id) => nextTree[id])
+              .filter((child) => child.checked || child.hasChildrenChecked);
+            if (childrenCheckedResult.length > 0) {
+              break;
+            }
+          }
+          parentNode.hasChildrenChecked = false;
+          parentNode = nextTree[parentNode.parentId];
+        }
+        // 再顺着还原 inPath
+        parentNode = nextTree[node.parentId];
+        while (parentNode != null) {
+          parentNode.inPath = true;
+          parentNode = nextTree[parentNode.parentId];
+        }
       }
-
-      // TODO 双击关闭 inPath 控制
-      const lastRowNode = nodeMatrix[nodeMatrix.length - 1][0];
-      let parentNode = nextTree[lastRowNode.parentId];
-      while (parentNode != null) {
-        parentNode.inPath = true;
-        parentNode = nextTree[parentNode.parentId];
-      }
-
       return nextTree;
     },
-    [cascaderTree, nodeMatrix, multiple]
+    [nodeMatrix, multiple]
   );
 
   useEffect(() => {
     // 递归初始化层级树
     const initialTree = generateTree();
-    // 根据默认值初始化节点状态 // TODO 如果初始化的不是可选中节点情况处理
-    let nextTree = initialTree;
-    // (value || defaultValue)?.forEach((path: Array<ValueType>) => {
-    //   const id = path.join(connectStr);
-    //   if (initialTree[id] != null) {
-    //     nextTree = getNextTree(initialTree, id);
-    //   }
-    // });
-    setCascaderTree(nextTree);
+    setCascaderTree(initialTree);
 
     // 使用生成的节点信息，初始化展示矩阵的第一列
-    // TODO 展示 defaultValue 所在行
     const firstRow: CascaderNodeType[] = [];
     dataSource.forEach((option) => {
       const id = getNodeId(rootId, option.value);
@@ -234,7 +236,22 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
       firstRow.push(node);
     });
     setNodeMatrix([firstRow]);
-    console.log(nextTree);
+
+    // 根据默认值初始化节点状态 // TODO 如果初始化的不是可选中节点情况处理
+    // let nextTree = initialTree;
+    // console.log(value || defaultValue);
+    // (value || defaultValue)?.forEach((path: Array<ValueType>) => {
+    //   let parentId = rootId;
+    //   path.forEach((value) => {
+    //     const id = getNodeId(parentId, value);
+    //     if (nextTree[id] != null) {
+    //       nextTree = getNextTree(nextTree, id, firstRow);
+    //       parentId = id;
+    //     }
+    //   });
+    // });
+    // setCascaderTree(nextTree);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataSource]);
 
@@ -258,52 +275,31 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
               inPath={node.inPath}
               checked={node.checked}
               onClick={() => {
-                // if (node.inPath) {
-                //   // 关闭子节点
-                //   setNodeMatrix((prev: CascaderNodeType[][]) => [
-                //     ...prev.filter((_, index) => index <= rowIndex),
-                //   ]);
-                // } else {
-                //   // 展开子节点
-                //   if (node.children.length > 0) {
-                //     setNodeMatrix((prev) => [
-                //       ...prev.filter((_, index) => index <= rowIndex),
-                //       node.children.map((nodeId) => cascaderTree[nodeId]),
-                //     ]);
-                //   }
-                // }
-                if (!node.allowCheck && node.inPath) {
+                if (node.children.length > 0 && !node.inPath) {
+                  // 展开子节点
+                  setNodeMatrix((prev) => [
+                    ...prev.filter((_, index) => index <= rowIndex),
+                    node.children.map((nodeId) => cascaderTree[nodeId]),
+                  ]);
+                } else {
                   // 关闭子节点
                   setNodeMatrix((prev: CascaderNodeType[][]) => [
                     ...prev.filter((_, index) => index <= rowIndex),
                   ]);
-                } else if (!node.inPath) {
-                  // 展开子节点
-                  if (node.children.length > 0) {
-                    setNodeMatrix((prev) => [
-                      ...prev.filter((_, index) => index <= rowIndex),
-                      node.children.map((nodeId) => cascaderTree[nodeId]),
-                    ]);
-                  }
                 }
 
                 const nextTree = getNextTree(cascaderTree, node.id);
                 setCascaderTree(nextTree);
 
-                // TODO 是否勾选当前节点
-                // const nextTree = getNextTree(cascaderTree, node.id);
-                // setCascaderTree(nextTree);
-
-                // TODO 外部回调
-                // if (onChange) {
-                //   const result: Array<string> = [];
-                //   Object.values(nextTree).forEach((innerNode) => {
-                //     if (innerNode.checked) {
-                //       result.push(innerNode.id);
-                //     }
-                //   });
-                //   onChange(result);
-                // }
+                if (node.allowCheck && onChange) {
+                  const result: Array<Array<string>> = [];
+                  Object.values(nextTree).forEach((iNode) => {
+                    if (iNode.checked) {
+                      result.push(iNode.id.split(splitter).slice(1));
+                    }
+                  });
+                  onChange(result);
+                }
               }}
             >
               {node.label}
