@@ -1,14 +1,16 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import * as serviceWorker from "./serviceWorker";
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable no-undef */
+import React from 'react';
+import ReactDOM from 'react-dom';
+import * as serviceWorker from './serviceWorker';
 
-import Demo from "./demo/index";
+import Demo from './demo/index';
 
 ReactDOM.render(
   <React.StrictMode>
     <Demo />
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root'),
 );
 
 // If you want your app to work offline and load faster, you can change

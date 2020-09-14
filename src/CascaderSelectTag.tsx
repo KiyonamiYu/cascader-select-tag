@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
-import Tag, { SizeType } from "./Tag";
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable max-len */
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-param-reassign */
+import React, { useState, useEffect, useCallback } from 'react';
+import Tag, { SizeType } from './Tag';
 
-const rootId = "$DUMMY_ROOT$";
-const splitter = "|-|";
+const rootId = '$DUMMY_ROOT$';
+const splitter = '|-|';
 
 function getNodeId(parentId: string, value: ValueType) {
   return `${parentId}${splitter}${value}`;
@@ -38,13 +42,13 @@ export interface CascaderNodeType {
 // TODO Props 设置
 const defaultProps = {
   style: {} as React.CSSProperties,
-  className: "",
-  prefixCls: "rhino",
+  className: '',
+  prefixCls: 'rhino',
   dataSource: [] as Array<CascaderOptionType>,
   value: [] as Array<Array<ValueType>>,
   defaultValue: [] as Array<Array<ValueType>>,
   multiple: false,
-  size: "middle" as SizeType,
+  size: 'middle' as SizeType,
 };
 
 export type CascaderSelectTagProps = typeof defaultProps & {
@@ -77,7 +81,7 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
     // 递归函数定义
     const recursive = (
       cascaderOption: CascaderOptionType,
-      parentId: string
+      parentId: string,
     ) => {
       const id = getNodeId(parentId, cascaderOption.value);
       newTree[id] = {
@@ -89,14 +93,12 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
             ? cascaderOption.multiple
             : multiple,
         allowCheck:
-          cascaderOption.allowCheck || // 默认父节点不能被 checked，但是可以通过 allowCheck 设置
-          cascaderOption.children == null ||
-          cascaderOption.children.length === 0, // 叶子节点一定可以被 checked
+          cascaderOption.allowCheck // 默认父节点不能被 checked，但是可以通过 allowCheck 设置
+          || cascaderOption.children == null
+          || cascaderOption.children.length === 0, // 叶子节点一定可以被 checked
         id,
         parentId,
-        children: (cascaderOption.children || []).map((child) =>
-          getNodeId(id, child.value)
-        ),
+        children: (cascaderOption.children || []).map((child) => getNodeId(id, child.value)),
         checked: false,
         inPath: false,
         hasChildrenChecked: false,
@@ -121,13 +123,13 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
       // 先取消所有节点的 inPath
       const nodeInpathTmp = node.inPath; // 为了双击收起能正常显示 inPath
       (function recursive(nodes: CascaderNodeType[]) {
-        for (const node of nodes) {
-          if (node.inPath) {
-            node.inPath = false;
-            recursive(node.children.map((id) => nextTree[id]));
+        nodes.forEach((inode) => {
+          if (inode.inPath) {
+            inode.inPath = false;
+            recursive(inode.children.map((id) => nextTree[id]));
           }
-        }
-      })(nodeMatrix[0]);
+        });
+      }(nodeMatrix[0]));
 
       // 如果这个节点不允许被勾选（单纯的父节点）
       if (!node.allowCheck) {
@@ -148,8 +150,11 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
         }
         // 先变回最初的状态
         while (parentNode != null) {
-          // !parentNode.multiple && !parentNode.hasChildrenChecked // 父节点单选且之前没有选择过，那选了子节点，也意味着选了父节点，如果祖先是单选就会被影响
-          // parentNode.multiple && !parentNode.hasChildrenChecked // 父节点多选且之前没有被选择过，那同上
+          // 父节点单选且之前没有选择过，那选了子节点，也意味着选了父节点，如果祖先是单选就会被影响
+          // !parentNode.multiple && !parentNode.hasChildrenChecked
+
+          // 父节点多选且之前没有被选择过，那同上
+          // parentNode.multiple && !parentNode.hasChildrenChecked
           if (parentNode.multiple && parentNode.hasChildrenChecked) {
             // 父节点多选，且之前就被选择过，那再选一个也没有关系
             break;
@@ -172,12 +177,11 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
               iNode.children
                 .map((id) => nextTree[id])
                 .filter(
-                  (child) =>
-                    child.checked || child.hasChildrenChecked || child.inPath
-                )
+                  (child) => child.checked || child.hasChildrenChecked || child.inPath,
+                ),
             );
           });
-        })(cleanRoots);
+        }(cleanRoots));
 
         // 再顺着还原 inPath、hasChildrenChecked
         parentNode = nextTree[node.parentId];
@@ -220,7 +224,7 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
       }
       return nextTree;
     },
-    [nodeMatrix, multiple]
+    [nodeMatrix, multiple],
   );
 
   useEffect(() => {
@@ -251,8 +255,6 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
     //   });
     // });
     // setCascaderTree(nextTree);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataSource]);
 
   return (
@@ -264,7 +266,7 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
         <div
           key={rowIndex}
           style={{
-            borderBottom: "1px dotted #C0C0C0",
+            borderBottom: '1px dotted #C0C0C0',
           }}
         >
           {rowNodes.map((node) => (

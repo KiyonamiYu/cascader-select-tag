@@ -1,33 +1,49 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-use-before-define */
+import React, { useState } from 'react';
+import { isTemplateExpression } from 'typescript';
 
-import CascaderSelectTag from "../CascaderSelectTag";
-import GoodCard from "./GoodsCard";
+import CascaderSelectTag from '../CascaderSelectTag';
+import GoodCard from './GoodsCard';
 
-import { dataSource1, dataSource2, allGoods, GoodsType } from "./mock-data";
+import {
+  dataSource1, dataSource2, allGoods, GoodsType,
+} from './mock-data';
 
 export default function Demo() {
   const [displayWindow, setDisplayWindow] = useState<GoodsType[]>([]);
   return (
     <>
       <h2>使用一：单选</h2>
+      <h3>Demo</h3>
       <CascaderSelectTag
         dataSource={dataSource1}
         // value={[["1", "1-2", "1-2-2", "1-2-2-1"]]}
         onChange={(result) => {
-          console.log("check", result);
+          console.log('demo1', result);
         }}
       />
       <h2>使用二：多选</h2>
+      <h3>Demo</h3>
       <CascaderSelectTag
         dataSource={dataSource1}
         multiple
         // value={[["1", "1-2", "1-2-2", "1-2-2-1"]]}
         onChange={(result) => {
-          console.log("check", result);
+          console.log('demo2', result);
+        }}
+      />
+      <h2>使用三：父组件可被勾选</h2>
+      <h3>Demo</h3>
+      <CascaderSelectTag
+        dataSource={dataSource1.map((item) => ({ ...item, allowCheck: true }))}
+        multiple
+        // value={[["1", "1-2", "1-2-2", "1-2-2-1"]]}
+        onChange={(result) => {
+          console.log('demo2', result);
         }}
       />
       <div>
-        <h2>使用三：单选多选结合、父节点可被选择（父节点包含子节点）</h2>
+        <h2>使用三：“父节点可被勾选”、“单选”、“多选”三者结合使用</h2>
         <h3>基本配置</h3>
         <ul>
           <li>
@@ -64,7 +80,7 @@ export default function Demo() {
           dataSource={dataSource2}
           // value={[["1", "1-2", "1-2-2", "1-2-2-1"]]}
           onChange={(result) => {
-            let goods: GoodsType[] = [];
+            const goods: GoodsType[] = [];
 
             result.forEach((path) => {
               const selectedValue = path[path.length - 1];
@@ -84,9 +100,17 @@ export default function Demo() {
             marginTop: 30,
           }}
         >
-          <div>共 {displayWindow.length} 件商品</div>
+          <div>
+            共
+            {' '}
+            <span style={{ fontSize: 20, fontWeight: 700 }}>
+              {displayWindow.length}
+            </span>
+            {' '}
+            件商品
+          </div>
           {displayWindow.map((item) => (
-            <GoodCard {...item} />
+            <GoodCard name={item.name} imgURL={item.imgURL} price={item.price} />
           ))}
         </div>
       </div>

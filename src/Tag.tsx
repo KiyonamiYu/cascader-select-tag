@@ -1,9 +1,9 @@
-import React from "react";
-import "./tag.css";
+import React from 'react';
+import './tag.css';
 
-const themeColor = "#0156F8";
+const themeColor = '#0156F8';
 
-export type SizeType = "small" | "middle" | "large";
+export type SizeType = 'small' | 'middle' | 'large';
 
 export interface TagProps {
   size?: SizeType; // TODO
@@ -18,7 +18,7 @@ export interface TagProps {
 
 export default function Tag(props: TagProps) {
   const {
-    size = "middle",
+    size = 'middle',
     multiple = false,
     children,
     hasChildren,
@@ -31,7 +31,7 @@ export default function Tag(props: TagProps) {
     <div
       className="tag"
       style={{
-        border: `1px solid ${inPath ? themeColor : "#C0C0C0"}`,
+        border: `1px solid ${inPath ? themeColor : '#C0C0C0'}`,
       }}
       onClick={onClick}
     >
@@ -48,8 +48,8 @@ export default function Tag(props: TagProps) {
       <span
         className="iconfont"
         style={{
-          display: hasChildren ? "inline-block" : "none",
-          color: hasChildrenChecked ? themeColor : "#C0C0C0",
+          display: hasChildren ? 'inline-block' : 'none',
+          color: hasChildrenChecked ? themeColor : '#C0C0C0',
           marginRight: 4,
         }}
       >

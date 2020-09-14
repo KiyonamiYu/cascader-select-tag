@@ -1,20 +1,22 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-use-before-define */
+import React from 'react';
 
 interface GoodsCardProps {
-  type: string;
   name: string;
   imgURL: string;
   price: number;
 }
 
 export default function GoodsCard(props: GoodsCardProps) {
-  const { type, name, imgURL, price } = props;
+  const {
+    name, imgURL, price,
+  } = props;
   return (
     <div
       style={{
-        display: "inline-block",
+        display: 'inline-block',
         width: 240,
-        border: "1px solid #cacaca",
+        border: '1px solid #cacaca',
         margin: 20,
       }}
     >
@@ -24,7 +26,7 @@ export default function GoodsCard(props: GoodsCardProps) {
           fontSize: 12,
           height: 40,
           margin: 10,
-          overflow: "hidden",
+          overflow: 'hidden',
         }}
       >
         {name}
@@ -36,7 +38,7 @@ export default function GoodsCard(props: GoodsCardProps) {
             fontSize: 20,
             fontWeight: 700,
             marginRight: 4,
-            color: "#ed462f",
+            color: '#ed462f',
           }}
         >
           {price}
