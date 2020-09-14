@@ -9,7 +9,15 @@ export default function Demo() {
   const [displayWindow, setDisplayWindow] = useState<GoodsType[]>([]);
   return (
     <>
-      <h1>多选</h1>
+      <h2>使用一：单选</h2>
+      <CascaderSelectTag
+        dataSource={dataSource1}
+        // value={[["1", "1-2", "1-2-2", "1-2-2-1"]]}
+        onChange={(result) => {
+          console.log("check", result);
+        }}
+      />
+      <h2>使用二：多选</h2>
       <CascaderSelectTag
         dataSource={dataSource1}
         multiple
@@ -19,8 +27,8 @@ export default function Demo() {
         }}
       />
       <div>
-        <h1>父节点包含子节点</h1>
-        <h2>基本配置</h2>
+        <h2>使用三：单选多选结合、父节点可被选择（父节点包含子节点）</h2>
+        <h3>基本配置</h3>
         <ul>
           <li>
             “待发货”、“待收货”、“评价”可单选。
@@ -29,7 +37,7 @@ export default function Demo() {
           <li>“男装”、“手机”、“生鲜”可多选，“手机”作为父节点可被勾选</li>
           <li>“三星”、“苹果”、“华为”、“OPPO”可多选</li>
         </ul>
-        <h2>勾选过程</h2>
+        <h3>勾选过程</h3>
         <p>
           “待发货”包含“男装”、“手机”、“生鲜”，但不限于这三类，比如还可以包含“图书”、“运动”等。
           所以当我们勾选“待发货”，就不单单是只有这三种品类，而是列举出全部品类的商品。
@@ -51,7 +59,7 @@ export default function Demo() {
             件商品品类分别是“一加”、“小米”、“魅族”
           </li>
         </ul>
-        <h2>Demo</h2>
+        <h3>Demo</h3>
         <CascaderSelectTag
           dataSource={dataSource2}
           // value={[["1", "1-2", "1-2-2", "1-2-2-1"]]}
