@@ -264,7 +264,7 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
         <div
           key={rowIndex}
           style={{
-            borderBottom: "1px solid red",
+            borderBottom: "1px dotted #C0C0C0",
           }}
         >
           {rowNodes.map((node) => (
@@ -274,6 +274,11 @@ export default function CascaderSelectTag(props: CascaderSelectTagProps) {
               hasChildrenChecked={node.hasChildrenChecked}
               inPath={node.inPath}
               checked={node.checked}
+              multiple={
+                cascaderTree[node.parentId]
+                  ? cascaderTree[node.parentId].multiple
+                  : multiple
+              }
               onClick={() => {
                 if (node.children.length > 0 && !node.inPath) {
                   // 展开子节点

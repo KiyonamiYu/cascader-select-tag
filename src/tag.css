@@ -1,0 +1,43 @@
+.tag {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 8px;
+}
+
+.tag-triangle {
+  position: absolute;
+  right: -15px;
+  top: -15px;
+  width: 30px;
+  height: 30px;
+  background: #0156f8;
+  transform: rotate(45deg);
+}
+
+.tag-triangle-text {
+  position: absolute;
+  bottom: 0;
+  transform: rotate(-45deg) translate(50%, 50%);
+  color: white;
+  font-size: 12px !important;
+}
+
+@font-face {
+  font-family: "iconfont";
+  src: url("./assets/icon-font/iconfont.eot");
+  src: url("./assets/icon-font/iconfont.eot?#iefix") format("embedded-opentype"),
+    url("./assets/icon-font/iconfont.woff2") format("woff2"),
+    url("./assets/icon-font/iconfont.woff") format("woff"),
+    url("./assets/icon-font/iconfont.ttf") format("truetype"),
+    url("./assets/icon-font/iconfont.svg#iconfont") format("svg");
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 14px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
